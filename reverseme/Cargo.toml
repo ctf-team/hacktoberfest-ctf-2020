@@ -1,0 +1,15 @@
+[package]
+name = "reverseme"
+version = "0.1.0"
+authors = ["ThrDev <zacharyb@clientcommand.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[profile.release]
+opt-level = 'z'  # Optimize for size.
+lto = true
+codegen-units = 1
+panic = 'abort'
+
+[dependencies]
+rand = "0.7.3"
