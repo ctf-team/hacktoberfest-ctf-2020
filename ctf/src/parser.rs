@@ -204,7 +204,7 @@ mod tests {
 
     #[test]
     fn can_parse_entire_command_input() {
-        let x= "test stuff --arg1=val1 --arg2 --arg3".to_string();
+        let x = "test stuff --arg1=val1 --arg2 --arg3".to_string();
         let output = parse_input(&x).unwrap();
         assert_eq!(output.name, "test");
         assert_eq!(

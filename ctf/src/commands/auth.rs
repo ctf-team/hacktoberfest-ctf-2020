@@ -1,7 +1,7 @@
-use crate::commands::Token;
-use crate::sock::Sock;
-
 use std::str;
+
+use crate::commands::Token;
+use crate::console::Console;
 
 pub struct Auth {
     logged_in: bool,
@@ -21,7 +21,7 @@ impl User {
 }
 
 impl Auth {
-    pub async fn new() -> Self {
+    pub fn new() -> Self {
         Auth {
             logged_in: false,
             user: None,
@@ -32,13 +32,14 @@ impl Auth {
         &self.user
     }
 
-    pub async fn logout(&mut self) -> String {
+    pub fn logout(&mut self, console: &mut Console) -> String {
         self.logged_in = false;
         self.user = None;
+        console.set_prompt("$".to_string());
         "Logged out!".to_string()
     }
 
-    pub async fn login(&mut self, token: &Token<'_>, sock: &mut Sock) -> String {
+    pub fn login(&mut self, token: &Token<'_>, console: &mut Console) -> String {
         let mut username: Option<&str> = None;
         let mut password: Option<&str> = None;
 
@@ -53,11 +54,11 @@ impl Auth {
         let read_user;
         let read_pass;
         if username == None || password == None {
-            let _ = sock.write("Username: ").await;
-            read_user = sock.read_till_newline(false).await.unwrap();
+            let _ = console.write_str("Username: ");
+            read_user = console.read_till_newline(false);
 
-            let _ = sock.write("Password: ").await;
-            read_pass = sock.read_till_newline(true).await.unwrap();
+            let _ = console.write_str("Password: ");
+            read_pass = console.read_till_newline(true);
 
             username = Some(&read_user.trim());
             password = Some(&read_pass.trim());
@@ -66,7 +67,7 @@ impl Auth {
         if username.unwrap() == "zac" && password.unwrap() == "09820" {
             self.logged_in = true;
             self.user = Some(User::new(username.unwrap()));
-            sock.set_prompt(format!("{}@ctf$", &self.user.as_ref().unwrap().username));
+            console.set_prompt(format!("{}@ctf$", &self.user.as_ref().unwrap().username));
             format!("Logged in as {}!", username.unwrap())
         } else {
             "Incorrect username or password!".to_string()
